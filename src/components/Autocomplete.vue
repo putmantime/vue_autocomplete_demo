@@ -1,4 +1,4 @@
-2<template>
+<template>
   <div style="position:relative" v-bind:class="{'open':openSuggestion}">
     <input class="form-control" type="text" :value="value" @input="updateValue($event.target.value)"
            @keydown.enter = 'enter'
@@ -10,7 +10,8 @@
           v-bind:class="{'active': isActive(index)}"
           @click="suggestionClick(index)"
       >
-        <a href="#">{{ suggestion.taxonLabel.value }} <br/> <small>Taxonomy ID: {{ suggestion.taxid.value }}</small>
+        <a href="#">{{ suggestion[anchor].value }} <br/>
+          <small>{{ descriptionLabel }}{{ suggestion[description].value }}</small>
         </a>
       </li>
     </ul>
@@ -26,9 +27,25 @@
         type: String,
         required: true,
       },
-
+//      list of objects
       suggestions: {
         type: Array,
+        required: true,
+      },
+//      the key that you would like to search on
+      anchor: {
+        type: String,
+        required: true,
+      },
+//      the key of supplemental information from the object that will be displayed on line
+//      2 of suggestion template
+      description: {
+        type: String,
+        required: true,
+      },
+//      string label for the second line descripiton to give it context e.g. 'Taxonomy ID: '
+      descriptionLabel: {
+        type: String,
         required: true,
       },
 
@@ -47,7 +64,7 @@
         // eslint-disable-next-line
         return this.suggestions.filter((obj) => {
             // eslint-disable-next-line
-            return obj.taxonLabel.value.indexOf(this.value) >= 0
+            return obj[this.anchor].value.indexOf(this.value) >= 0
             // eslint-disable-next-line
           })
       },
@@ -60,7 +77,6 @@
     },
 
     methods: {
-
       updateValue(value) {
         if (this.open === false) {
           this.open = true;
@@ -71,10 +87,9 @@
 
       // When enter pressed on the input
       enter() {
-        this.$emit('input', this.matches[this.current].taxonLabel.value);
+        this.$emit('input', this.matches[this.current][this.anchor].value);
+
         this.open = false;
-        // eslint-disable-next-line
-        console.log('you just chose' + this.matches[this.current].taxonLabel.value);
       },
 
       // When up pressed while suggestions are open
@@ -100,7 +115,7 @@
 
       // When one of the suggestion is clicked
       suggestionClick(index) {
-        this.$emit('input', this.matches[index].taxonLabel.value);
+        this.$emit('input', this.matches[index][this.anchor].value);
         this.open = false;
       },
 

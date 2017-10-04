@@ -4,9 +4,19 @@
       <div class="col-md-4"></div>
       <div class="col-md-4">
         <h1> Bacterial Genus </h1>
-        <autocomplete :suggestions="suggestions" v-model="selection"></autocomplete>
+        <auto-complete :suggestions="suggestions"
+                       anchor="taxonLabel"
+                       description="taxid"
+                       descriptionLabel="Taxonomy ID: "
+                       v-model="selection"
+        >
+        </auto-complete>
         <br/>
-        {{ selection }}
+        <div v-for="suggestion in suggestions">
+          <div v-show="suggestion.taxonLabel.value === selection">
+            <pre>{{ suggestion }}</pre>
+          </div>
+        </div>
       </div>
       <div class="col-md-4"></div>
     </div>
@@ -20,7 +30,7 @@
   export default {
     name: 'hello',
     components: {
-      autocomplete,
+      'auto-complete': autocomplete,
     },
     data() {
       return {
@@ -41,8 +51,6 @@
 
         axios.get(endpoint + query)
           .then((resp) => {
-          // eslint-disable-next-line
-            console.log(resp.data.results.bindings);
             this.suggestions = resp.data.results.bindings;
           })
           .catch((err) => {
